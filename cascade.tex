@@ -1,0 +1,57 @@
+\documentclass[varwidth=210mm, border={20mm 20mm 20mm 20mm}]{standalone}
+
+\usepackage{lipsum}
+\usepackage[most]{tcolorbox} % Load tcolorbox for advanced box designs
+% Define a custom box style
+\tcbuselibrary{skins} % Enable advanced options for tcolorbox
+\tcbset{
+    custombox/.style={
+        enhanced, % Enable enhancements
+        frame hidden, % Hides top, right, bottom borders
+        borderline west={0.5mm}{0pt}{black}, % Add only the left border
+        colframe=black,
+        sharp corners,
+        left=2mm, % Horizontal shift from the content
+        right=0mm, % No shift on the right
+        top=1mm, % Minimal padding on the top
+        bottom=0mm,
+        boxsep=0mm, % Control internal margin between border and text
+        colback=white,
+        breakable, % breaks across pages
+        parbox=false,
+        fit algorithm=hybrid*,
+        segmentation style={solid},
+    }
+}
+\usepackage{forloop}
+\newcounter{i}
+\newcounter{depth}
+\newcommand{\stepin}{\stepcounter{depth}\begin{tcolorbox}[custombox]}
+\newcommand{\stepout}{\end{tcolorbox}\addtocounter{depth}{-1}}
+\newenvironment{cascade}[0]
+{%
+    \setcounter{depth}{0}
+    }%
+    {
+    \forloop{i}{0}{\value{i} < \value{depth}}{\end{tcolorbox}}
+}
+
+\title{Thoughts}
+\author{Tobi}
+
+\begin{document}
+\section{Let's Go}
+\begin{cascade}
+    \stepin
+    \lipsum[3-3]
+    \stepin
+    \lipsum[4-4]
+\end{cascade}
+\begin{cascade}
+    \stepin
+    \lipsum[2-2]
+\end{cascade}
+\begin{cascade}
+    \lipsum[5-5]
+\end{cascade}
+\end{document}
