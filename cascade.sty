@@ -1,0 +1,56 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{cascade}[2024/12/19 v1.0 v-Lines with Indentation]
+
+%nested |tcolorbox| cannot do page-breaks!
+%workarounds:
+%1. use a standalone documentclass (infinit page-length):
+    %\documentclass[varwidth=170mm, border={2cm 2cm 2cm 2cm}]{standalone}
+%2. avoid more than 1 line for more than one page-height
+%3. TODO: find better workarounds.
+
+\RequirePackage{forloop} % loop through forgotten |\stepout| at the end of |cascade|-environment
+\RequirePackage{fp} % floating-point calculations for depth-dependent line thickness
+\RequirePackage[most]{tcolorbox} % Load tcolorbox for advanced box designs
+
+\makeatletter
+% Define a custom box style
+\tcbuselibrary{skins} % Enable advanced options for tcolorbox
+\tcbset{
+    mythickness/.store in=\borderthickness, % Define a key to store thickness value
+    custombox/.style={
+        enhanced, % Enable enhancements
+        frame hidden, % Hides top, right, bottom borders
+        borderline west={\borderthickness pt}{0pt}{black}, % Add only the left border
+        left=2mm, % Horizontal shift from the content
+        right=0mm, % No shift on the right
+        top=1mm, % Minimal padding on the top
+        bottom=0mm,
+        boxsep=0mm, % Control internal margin between border and text
+        colback=white,
+        breakable, % breaks across pages
+    }
+}
+\newcounter{d@pth} % 0-based counter of how deep down we are in the cascade
+\newcommand{\setthickn@ss}{\FPeval\borderthickness{round(3/(\thed@pth+1), 2)}} % thickness from reciprocal d@pth
+% level-controlling user command definitions
+\newcommand{\stepin}{\stepcounter{d@pth}\setthickn@ss\begin{tcolorbox}[custombox]} % go one deeper
+\newcommand{\stepout}{\end{tcolorbox}\addtocounter{d@pth}{-1}\setthickn@ss} % exit one level
+\newcounter{i@} % for loop variable
+
+% the main environment
+\newenvironment{cascade}[0]%
+{%
+    \let\oldparindent\parindent % indentation looks bad inside so we set it 0 inside
+    \setlength{\parindent}{0pt}
+    \setcounter{d@pth}{0} % reset d@pth counter
+}%end cascade initial block
+{%
+\forloop{i@}{0}{\value{i@} < \value{d@pth}}{\end{tcolorbox}} % taking care of forgotten \stepout's
+\setlength{\parindent}{\oldparindent} % reset parindent length to the value outside
+}%end cascade final block
+
+% ideas for options:
+% nolines ... remove borderline west altogether
+% shiftwidth ... make left=2mm arbitrary
+\makeatother
+\endinput

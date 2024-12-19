@@ -3,45 +3,7 @@
 
 \usepackage{lipsum}
 \usepackage{hyperref}
-\usepackage[most]{tcolorbox} % Load tcolorbox for advanced box designs
-% Define a custom box style
-\tcbuselibrary{skins} % Enable advanced options for tcolorbox
-\tcbset{
-    mythickness/.store in=\borderthickness, % Define a key to store thickness value
-    custombox/.style={
-        enhanced, % Enable enhancements
-        frame hidden, % Hides top, right, bottom borders
-        borderline west={\borderthickness pt}{0pt}{black}, % Add only the left border
-        left=2mm, % Horizontal shift from the content
-        right=0mm, % No shift on the right
-        top=1mm, % Minimal padding on the top
-        bottom=0mm,
-        boxsep=0mm, % Control internal margin between border and text
-        colback=white,
-        breakable, % breaks across pages
-    }
-}
-\usepackage{forloop,fp}
-\newcounter{i}
-\newcounter{depth} % 0-based counter of how deep down we are in the cascade
-\newcommand{\setthickness}{\FPeval\borderthickness{round(3/(\thedepth+1), 2)}} % thickness from reciprocal depth
-\newcommand{\stepin}{\stepcounter{depth}\setthickness\begin{tcolorbox}[custombox]} % go one deeper
-\newcommand{\stepout}{\end{tcolorbox}\addtocounter{depth}{-1}\setthickness} % exit one level
-% the main environment
-\newenvironment{cascade}[0]
-{%
-    \let\oldparindent\parindent % indentation looks bad inside so we set it 0 inside
-    \setlength{\parindent}{0pt}
-    \setcounter{depth}{0} % reset depth counter
-    }%
-    {
-    \forloop{i}{0}{\value{i} < \value{depth}}{\end{tcolorbox}} % taking care of forgotten \stepout's
-    \setlength{\parindent}{\oldparindent} % reset parindent length to the value outside
-}
-
-% ideas for options:
-% nolines ... remove borderline west altogether
-% shiftwidth ... make left=2mm arbitrary
+\usepackage{cascade}
 
 \title{THOUGHTS ON EVOLUTIONARY CREATION}
 \author{Tobi}
