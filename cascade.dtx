@@ -1,0 +1,247 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2025 by Tobias Hochreiter tobias.hochreiter@gmx.at
+% ---------------------------------------------------------------------------
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainer of this work is <+maintainer+>.
+%
+% This work consists of the files cascade.dtx and cascade.ins
+% and the derived filebase cascade.sty.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{cascade.dtx}
+%</driver>
+%<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+%<package>\ProvidesPackage{cascade}
+%<*package>
+    [04.01.2025 v1.0 indented vertical lines]
+%</package>
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{cascade}[<+date+>]
+\usepackage{tcolorbox}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\begin{document}
+  \DocInput{cascade.dtx}
+  \PrintChanges
+  \PrintIndex
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{43}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v1.0}{04.01.2025}{Converted to DTX file}
+%
+% \DoNotIndex{\newcommand,\newenvironment}
+%
+% \providecommand*{\url}{\texttt}
+% \GetFileInfo{cascade.dtx}
+% \title{The \textsf{cascade} package}
+% \author{Tobias Hochreiter \\ \url{tobias.hochreiter@gmx.at}}
+% \date{\fileversion~from \filedate}
+%
+% \maketitle
+%
+% \section{Usage}
+%
+% \DescribeMacro{\stepin}
+% This command increases the depth (i.e. the number of parallel vertical lines) by one.
+%
+% \DescribeMacro{\stepout}
+% This command decreases the depth (i.e. the number of parallel vertical lines) by one.
+%
+%
+% \DescribeEnv{cascade}
+% This environment needs to surround the |\stepin| and |\stepout| commands.\\
+% It creates nested boxes, hence it \textbf{can only handle page-breaks if the depth is less equal 1!}
+
+% 
+% \begin{tcolorbox}[colframe=gray!50, colback=white, coltitle=black, title=Example, boxsep=1mm, left=0mm, right=0mm, bottom=0mm]
+% \footnotesize
+% \begin{minipage}[t]{0.45\textwidth}
+% |begin{cascade}|\\
+% \hspace*{.2cm}|Initial thought|\\
+% \hspace*{.2cm}|\stepin|\\
+% \hspace*{.2cm}|First comment\\|\\
+% \hspace*{.2cm}|Second comment|\\
+% \hspace*{.2cm}|\stepin|\\
+% \hspace*{.2cm}|Comment on the above "Second comment"|\\
+% \hspace*{.2cm}|\stepin|\\
+% \hspace*{.2cm}|And another note on that last comment.\\|\\
+% \hspace*{.2cm}|The amount of lines is called "depth".|\\
+% \hspace*{.2cm}|\stepout|\\
+% \hspace*{.2cm}|Another comment on the "Second comment"|\\
+% |end{cascade}|\\[.5cm]
+% \end{minipage}
+% \hfill
+% \begin{minipage}[t]{0.45\textwidth}
+% \begin{cascade}Initial thought\stepin First comment \\Second comment\stepin Comment on the above "Second comment"\stepin And another note on that last comment.\\The amount of lines is called "depth".\stepout Another comment on the "Second comment"
+% \end{cascade}
+% \end{minipage}
+% \end{tcolorbox}
+%
+% \StopEventually{}
+%
+% \section{Implementation}
+%
+% \iffalse
+%<*package>
+% \fi
+%
+%    \begin{macrocode}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{cascade}[2024/12/19 v1.0 Vertical Lines with Indentation]
+%    \end{macrocode}
+%\textbf{Note Important:} Nested |tcolorbox| cannot do page-breaks!\\
+%Workarounds:
+%\begin{enumerate}
+%\item Use a standalone documentclass (infinite page-length):\\
+%e.g. |\documentclass[varwidth=170mm, border={2cm 2cm 2cm 2cm}]{standalone}|
+%\item Avoid more than 1 line for more than one page-height
+%\item \textit{TODO}: find better workarounds.
+%\end{enumerate}
+%
+%\subsection{Packages}
+%loop through forgotten |\stepout| at the end of |cascade|-environment
+%    \begin{macrocode}
+\RequirePackage{forloop}
+%    \end{macrocode}
+%floating-point calculations for depth-dependent line thickness
+%    \begin{macrocode}
+\RequirePackage{fp}
+%    \end{macrocode}
+%Load tcolorbox for advanced box designs
+%    \begin{macrocode}
+\RequirePackage[most]{tcolorbox}
+\makeatletter
+%    \end{macrocode}
+%\subsection{Ideas for options}
+%\begin{itemize}
+%\item |nolines| ... remove borderline west altogether
+%\item |shiftwidth| ... make left=2mm arbitrary
+%\end{itemize}
+%
+%\subsection{Actual Implementation}
+%Define a custom box style
+%    \begin{macrocode}
+\tcbuselibrary{skins}%Enable advanced options for tcolorbox
+\tcbset{
+    mythickness/.store in=\borderthickness,%Define a key to store thickness value
+    custombox/.style={
+        enhanced,%Enable enhancements
+        frame hidden,%Hides top, right, bottom borders
+        borderline west={\borderthickness pt}{0pt}{black},%Add only the left border
+        left=2mm,%Horizontal shift from the content
+        right=0mm,%No shift on the right
+        top=1mm,%Minimal padding on the top
+        bottom=0mm,
+        boxsep=0mm,%Control internal margin between border and text
+        colback=white,
+        breakable,%breaks across pages
+    }
+}
+%    \end{macrocode}
+%0-based counter of how deep down we are in the cascade:
+%    \begin{macrocode}
+\newcounter{d@pth}
+%    \end{macrocode}
+%
+% \begin{macro}{\setthickn@ss}
+%Calculate thickness from reciprocal d@pth:
+%    \begin{macrocode}
+\newcommand{\setthickn@ss}{\FPeval\borderthickness{round(3/(\thed@pth+1), 2)}}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\stepin}
+%\subsection{level-controlling user command definitions}
+%go one deeper (i.e. add one vertical line)
+%    \begin{macrocode}
+\newcommand{\stepin}{\stepcounter{d@pth}\setthickn@ss\begin{tcolorbox}[custombox]}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\stepout}
+%exit one level (i.e. delete one vertical line for everything below the command)
+%    \begin{macrocode}
+\newcommand{\stepout}{\end{tcolorbox}\addtocounter{d@pth}{-1}\setthickn@ss}
+%    \end{macrocode}
+% \end{macro}
+%
+%for loop variable
+%    \begin{macrocode}
+\newcounter{i@}
+%    \end{macrocode}
+%
+% \begin{environment}{cascade}
+%\subsection{the main environment}
+%    \begin{macrocode}
+\newenvironment{cascade}[0]{%
+%    \end{macrocode}
+%indentation looks bad inside so we set it 0 inside
+%    \begin{macrocode}
+    \let\oldparindent\parindent
+    \setlength{\parindent}{0pt}
+%    \end{macrocode}
+%reset d@pth counter
+%    \begin{macrocode}
+    \setcounter{d@pth}{0}
+}%end cascade initial block
+{%
+%    \end{macrocode}
+%taking care of forgotten |\stepout|'s
+%    \begin{macrocode}
+\forloop{i@}{0}{\value{i@} < \value{d@pth}}{\end{tcolorbox}}
+%    \end{macrocode}
+%reset parindent length to the value outside
+%    \begin{macrocode}
+\setlength{\parindent}{\oldparindent}
+}%end cascade final block
+\makeatother
+\endinput
+%    \end{macrocode}
+% \end{environment}
+%
+
+%
+% \iffalse
+%</package>
+% \fi
+%
+% \Finale
+\endinput
