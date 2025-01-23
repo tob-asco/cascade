@@ -92,6 +92,8 @@
 % \begin{tcolorbox}[colframe=gray!50, colback=white, coltitle=black, title=Example, boxsep=1mm, left=0mm, right=0mm, bottom=0mm]
 % \footnotesize
 % \begin{minipage}[t]{0.45\textwidth}
+% |usepackage{cascade} % needs cascade.sty!|\\
+% |begin{document}|\\[.1cm]
 % |begin{cascade}|\\
 % \hspace*{.2cm}|Initial thought|\\
 % \hspace*{.2cm}|\stepin|\\
@@ -104,10 +106,12 @@
 % \hspace*{.2cm}|The amount of lines is called "depth".|\\
 % \hspace*{.2cm}|\stepout|\\
 % \hspace*{.2cm}|Another comment on the "Second comment"|\\
-% |end{cascade}|\\[.5cm]
+% |end{cascade}|\\[.1cm]
+% |end{document}|
 % \end{minipage}
 % \hfill
 % \begin{minipage}[t]{0.45\textwidth}
+% \vspace{.2cm}
 % \begin{cascade}Initial thought\stepin First comment \\Second comment\stepin Comment on the above "Second comment"\stepin And another note on that last comment.\\The amount of lines is called "depth".\stepout Another comment on the "Second comment"
 % \end{cascade}
 % \end{minipage}
